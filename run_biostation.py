@@ -7,7 +7,7 @@ Provides test selection, code generation, debugging, and educational content.
 
 from app import create_app
 import sys
-import os
+import os9
 
 # Create Flask application
 app = create_app(config_name=os.getenv('FLASK_ENV', 'development'))
