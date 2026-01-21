@@ -1,0 +1,806 @@
+/* ================================================
+   AI Capability Guidebook - Styles
+   A non-invasive, collapsible side-panel UI component
+   ================================================ */
+
+/* ============ PANEL CONTAINER ============ */
+.guidebook-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 500px;
+    max-width: 90vw;
+    min-width: 300px;
+    /* Constrain resizing */
+    height: 100vh;
+    background-color: var(--bg-sidebar);
+    border-left: 1px solid var(--border-subtle);
+    border-radius: 16px 0 0 16px;
+    /* Smooth rounded corners on the left */
+    z-index: 500;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    /* Smoother elastic transition */
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.4);
+    /* Deeper, softer shadow */
+}
+
+/* Draggable Resize Handle */
+.guidebook-drag-handle {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    cursor: col-resize;
+    z-index: 510;
+    background: transparent;
+    transition: background 0.2s;
+    touch-action: none;
+    /* Prevent scroll interference */
+}
+
+.guidebook-drag-handle:hover,
+.guidebook-drag-handle.dragging {
+    background: rgba(var(--accent-color-rgb), 0.3);
+}
+
+.guidebook-panel.resizing {
+    transition: none;
+    /* Disable transition during drag for responsiveness */
+    user-select: none;
+    /* Prevent text selection while dragging */
+}
+
+.guidebook-panel.open {
+    transform: translateX(0);
+}
+
+/* ============ HEADER ============ */
+.guidebook-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--bg-sidebar);
+    /* Cleaner solid background */
+}
+
+.guidebook-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+}
+
+.guidebook-title-icon {
+    font-size: 22px;
+    color: var(--accent-color);
+}
+
+.guidebook-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.guidebook-close-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+/* ============ SEARCH BAR ============ */
+.guidebook-search {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.guidebook-search-input {
+    width: 100%;
+    padding: 12px 14px;
+    padding-left: 40px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    /* More rounded pill shape */
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.guidebook-search-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.guidebook-search-input:focus {
+    border-color: var(--accent-color);
+}
+
+.guidebook-search-wrapper {
+    position: relative;
+}
+
+.guidebook-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 18px;
+    pointer-events: none;
+}
+
+/* ============ CONTENT AREA ============ */
+.guidebook-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 0;
+}
+
+/* ============ CATEGORY SECTIONS ============ */
+.guidebook-category {
+    margin-bottom: 8px;
+}
+
+.guidebook-category-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    /* More breathing room */
+    cursor: pointer;
+    transition: background 0.2s;
+    user-select: none;
+    margin: 4px 8px;
+    /* Floating items feel */
+    border-radius: 10px;
+}
+
+.guidebook-category-header:hover {
+    background: var(--bg-hover);
+}
+
+.guidebook-category-icon {
+    font-size: 20px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 8px;
+    /* Softer corners */
+    color: var(--accent-color);
+    transition: all 0.2s ease;
+}
+
+.guidebook-category-header:hover .guidebook-category-icon {
+    background: rgba(var(--accent-color-rgb), 0.2);
+    transform: scale(1.05);
+}
+
+.guidebook-category-title {
+    flex: 1;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.guidebook-category-chevron {
+    color: var(--text-secondary);
+    font-size: 20px;
+    transition: transform 0.25s ease;
+}
+
+.guidebook-category.expanded .guidebook-category-chevron {
+    transform: rotate(180deg);
+}
+
+.guidebook-category-items {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.guidebook-category.expanded .guidebook-category-items {
+    max-height: 2000px;
+    transition: max-height 0.5s ease-in;
+}
+
+/* ============ CAPABILITY ITEMS ============ */
+.guidebook-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.guidebook-item:last-child {
+    border-bottom: none;
+}
+
+.guidebook-item-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px 10px 46px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.guidebook-item-header:hover {
+    background: var(--bg-hover);
+}
+
+.guidebook-item-title {
+    flex: 1;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+.guidebook-item.expanded .guidebook-item-title {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.guidebook-item-chevron {
+    color: var(--text-secondary);
+    font-size: 18px;
+    transition: transform 0.2s ease;
+    opacity: 0.6;
+}
+
+.guidebook-item.expanded .guidebook-item-chevron {
+    transform: rotate(180deg);
+    opacity: 1;
+}
+
+/* ============ ITEM DETAILS (Expanded Content) ============ */
+.guidebook-item-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.guidebook-item.expanded .guidebook-item-details {
+    max-height: 1500px;
+    transition: max-height 0.4s ease-in;
+}
+
+.guidebook-item-content {
+    padding: 12px 16px 16px 46px;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+/* ============ DETAIL SECTIONS ============ */
+.guidebook-section {
+    margin-bottom: 14px;
+}
+
+.guidebook-section:last-child {
+    margin-bottom: 0;
+}
+
+.guidebook-section-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--accent-color);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.guidebook-section-label .material-icons-round {
+    font-size: 14px;
+}
+
+.guidebook-section-text {
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    line-height: 1.55;
+}
+
+/* ============ STEP-BY-STEP INSTRUCTIONS ============ */
+.guidebook-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: step-counter;
+}
+
+.guidebook-step {
+    position: relative;
+    padding-left: 28px;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+.guidebook-step:last-child {
+    margin-bottom: 0;
+}
+
+.guidebook-step::before {
+    counter-increment: step-counter;
+    content: counter(step-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    background: rgba(var(--accent-color-rgb), 0.2);
+    color: var(--accent-color);
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ============ EXAMPLE PROMPTS ============ */
+.guidebook-prompt {
+    background: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.guidebook-prompt:last-child {
+    margin-bottom: 0;
+}
+
+.guidebook-prompt:hover {
+    border-color: var(--accent-color);
+    background: rgba(var(--accent-color-rgb), 0.05);
+}
+
+.guidebook-prompt-text {
+    font-size: 0.82rem;
+    color: var(--text-primary);
+    font-family: 'Consolas', 'Monaco', monospace;
+    line-height: 1.4;
+    padding-right: 60px;
+    word-break: break-word;
+}
+
+.guidebook-prompt-copy {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.guidebook-prompt:hover .guidebook-prompt-copy {
+    opacity: 1;
+}
+
+.guidebook-prompt-copy:hover {
+    background: #0d8a6a;
+}
+
+.guidebook-prompt-copy.copied {
+    background: #22c55e;
+}
+
+.guidebook-prompt-copy .material-icons-round {
+    font-size: 12px;
+}
+
+/* ============ USE PROMPT BUTTON ============ */
+.guidebook-use-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: transparent;
+    border: 1px dashed var(--border-subtle);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.guidebook-use-btn:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: rgba(var(--accent-color-rgb), 0.05);
+}
+
+.guidebook-use-btn .material-icons-round {
+    font-size: 16px;
+}
+
+/* ============ FOOTER ============ */
+.guidebook-footer {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-subtle);
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.guidebook-footer a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+.guidebook-footer a:hover {
+    text-decoration: underline;
+}
+
+/* ============ TOGGLE BUTTON (in top bar) ============ */
+.guidebook-toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    margin-left: auto;
+}
+
+.guidebook-toggle-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.guidebook-toggle-btn.active {
+    color: var(--accent-color);
+    background: rgba(var(--accent-color-rgb), 0.1);
+}
+
+/* ============ OVERLAY (optional backdrop) ============ */
+.guidebook-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 499;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+}
+
+.guidebook-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ============ NO RESULTS STATE ============ */
+.guidebook-no-results {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.guidebook-no-results-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.guidebook-no-results-text {
+    font-size: 0.9rem;
+}
+
+/* ============ BADGE STYLES ============ */
+.guidebook-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    background: rgba(var(--accent-color-rgb), 0.15);
+    color: var(--accent-color);
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    margin-left: 8px;
+}
+
+.guidebook-badge.popular {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+}
+
+.guidebook-badge.new {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+/* ============ RESPONSIVE STYLES ============ */
+@media (max-width: 768px) {
+    .guidebook-panel {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .guidebook-overlay.visible {
+        display: block;
+    }
+}
+
+@media (max-width: 480px) {
+    .guidebook-item-header {
+        padding-left: 20px;
+    }
+
+    .guidebook-item-content {
+        padding-left: 20px;
+    }
+
+    .guidebook-prompt-text {
+        font-size: 0.78rem;
+    }
+}
+
+/* ============ SCROLLBAR ============ */
+.guidebook-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.guidebook-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.guidebook-content::-webkit-scrollbar-thumb {
+    background: #424242;
+    border-radius: 3px;
+}
+
+.guidebook-content::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* ============ ANIMATIONS ============ */
+@keyframes guidebook-slide-in {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes guidebook-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.guidebook-item-content {
+    animation: guidebook-fade-in 0.2s ease-out;
+}
+
+/* ============ REFERENCE CATEGORY (Statistical Tests) ============ */
+.guidebook-reference .guidebook-category-header {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), transparent);
+}
+
+.guidebook-reference .guidebook-category-icon {
+    background: rgba(59, 130, 246, 0.15);
+}
+
+/* ============ SUBCATEGORIES ============ */
+.guidebook-subcategory {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.guidebook-subcategory:last-child {
+    border-bottom: none;
+}
+
+.guidebook-subcategory-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px 10px 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+    user-select: none;
+}
+
+.guidebook-subcategory-header:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.guidebook-subcategory-icon {
+    font-size: 16px;
+    width: 24px;
+    text-align: center;
+}
+
+.guidebook-subcategory-title {
+    font-weight: 500;
+    font-size: 0.88rem;
+    color: var(--text-primary);
+}
+
+.guidebook-subcategory-desc {
+    flex: 1;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-left: 8px;
+}
+
+.guidebook-subcategory-chevron {
+    color: var(--text-secondary);
+    font-size: 18px;
+    transition: transform 0.2s ease;
+    opacity: 0.6;
+    margin-left: auto;
+}
+
+.guidebook-subcategory.expanded .guidebook-subcategory-chevron {
+    transform: rotate(180deg);
+    opacity: 1;
+}
+
+.guidebook-subcategory-tests {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.guidebook-subcategory.expanded .guidebook-subcategory-tests {
+    max-height: 5000px;
+    transition: max-height 0.5s ease-in;
+}
+
+/* ============ REFERENCE TESTS ============ */
+.guidebook-ref-test {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.guidebook-ref-test:last-child {
+    border-bottom: none;
+}
+
+.guidebook-ref-test-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px 10px 44px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.guidebook-ref-test-header:hover {
+    background: var(--bg-hover);
+}
+
+.guidebook-ref-test-title {
+    flex: 1;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+.guidebook-ref-test.expanded .guidebook-ref-test-title {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.guidebook-ref-test .guidebook-item-chevron {
+    color: var(--text-secondary);
+    font-size: 16px;
+    transition: transform 0.2s ease;
+    opacity: 0.5;
+}
+
+.guidebook-ref-test.expanded .guidebook-item-chevron {
+    transform: rotate(180deg);
+    opacity: 1;
+}
+
+.guidebook-ref-test-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.guidebook-ref-test.expanded .guidebook-ref-test-details {
+    max-height: 800px;
+    transition: max-height 0.4s ease-in;
+}
+
+.guidebook-ref-test-content {
+    padding: 10px 16px 16px 44px;
+    animation: guidebook-fade-in 0.2s ease-out;
+}
+
+/* ============ REFERENCE SECTIONS ============ */
+.guidebook-ref-section {
+    margin-bottom: 12px;
+}
+
+.guidebook-ref-section:last-child {
+    margin-bottom: 0;
+}
+
+.guidebook-ref-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 600;
+    font-size: 0.72rem;
+    color: #6b7280;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.guidebook-ref-label .material-icons-round {
+    font-size: 13px;
+    color: var(--accent-color);
+}
+
+.guidebook-ref-text {
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+/* ============ RECOMMENDED BADGE ============ */
+.guidebook-badge.recommended {
+    background: rgba(16, 163, 127, 0.15);
+    color: var(--accent-color);
+}
+
+/* Expand max-height for larger reference content */
+.guidebook-reference.expanded .guidebook-category-items {
+    max-height: 10000px;
+}

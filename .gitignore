@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Flask
+instance/
+.webassets-cache
+
+# Logs
+logs/
+*.log
+
+# Uploads
+data/temp_uploads/*
+!data/temp_uploads/.gitkeep
+
+# ChromaDB
+chromadb/
+
+# R
+.Rhistory
+.RData
+.Rproj.user
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# PyArmor (obfuscation output)
+dist/
+.pyarmor/
+
+# Installer builds
+installer/
+*.exe
+*.dmg
+*.pkg
+
+# Environment variables
+.env
+
+# Temporary files
+*.tmp
+*.bak

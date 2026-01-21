@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioStation AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <!-- Prism.js for code highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <!-- AI Capability Guidebook -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/guidebook.css') }}">
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="new-chat-btn" id="new-chat-btn">
+                <span class="material-icons-round">add</span>
+                New chat
+            </button>
+        </div>
+
+        <div class="history-list" id="history-list">
+            <div class="loading-history">Loading...</div>
+        </div>
+
+        <div class="user-profile">
+            <div class="user-avatar">🧬</div>
+            <div class="user-info">
+                <div class="user-name">BioStation User</div>
+                <div class="user-plan">Local Analysis</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <button class="sidebar-toggle-btn" id="sidebar-toggle">
+                <span class="material-icons-round">menu</span>
+            </button>
+            <div class="model-selector">
+                BioStation AI <span class="version">Phi-3</span>
+            </div>
+            <button class="icon-btn" id="teach-btn" title="Teach BioStation"
+                style="margin-left: 10px; color: var(--text-secondary);">
+                <span class="material-icons-round">school</span>
+            </button>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area" id="chat-messages">
+            <!-- Empty State / Hero -->
+            <div class="empty-state" id="empty-state">
+                <div class="logo-hero">🧬</div>
+                <h2>How can I help you analyze your data?</h2>
+
+                <div class="suggestion-grid">
+                    <button class="suggestion-card" onclick="setInput('Which statistical test should I use?')">
+                        <div class="suggestion-text">Compare groups</div>
+                        <div class="suggestion-sub">Statistical Advisory</div>
+                    </button>
+                    <button class="suggestion-card" onclick="setInput('Generate R code for a Mann-Whitney U test')">
+                        <div class="suggestion-text">Generate R Code</div>
+                        <div class="suggestion-sub">Code Generation</div>
+                    </button>
+                    <button class="suggestion-card"
+                        onclick="setInput('Explain the difference between parametric and non-parametric tests')">
+                        <div class="suggestion-text">Explain concepts</div>
+                        <div class="suggestion-sub">Educational Guide</div>
+                    </button>
+                    <button class="suggestion-card" onclick="document.getElementById('file-input').click()">
+                        <div class="suggestion-text">Analyze my dataset</div>
+                        <div class="suggestion-sub">Upload CSV/Excel</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area-container">
+            <div class="input-area">
+                <div class="input-actions-left">
+                    <button class="icon-btn" id="upload-btn" title="Attach file">
+                        <span class="material-icons-round">attach_file</span>
+                    </button>
+                    <input type="file" id="file-input" accept=".csv,.txt,.xlsx,.xls" style="display: none;">
+                </div>
+
+                <div style="flex: 1; display: flex; flex-direction: column; width: 100%;">
+                    <div id="file-preview-area" class="file-preview-area"></div>
+                    <textarea id="user-input" placeholder="Message BioStation AI..." rows="1"></textarea>
+                </div>
+
+                <div class="input-actions-right">
+                    <button class="icon-btn stop-btn" id="stop-btn" title="Stop generating"
+                        style="display: none; color: #ef4444;">
+                        <span class="material-icons-round">stop_circle</span>
+                    </button>
+                    <button class="send-btn" id="send-btn" disabled>
+                        <span class="material-icons-round">arrow_upward</span>
+                    </button>
+                </div>
+            </div>
+            <div class="disclaimer">
+                BioStation AI runs locally. Your data never leaves your machine.
+            </div>
+        </div>
+    </main>
+
+    <!-- Context Menu for history items -->
+    <div class="context-menu" id="context-menu" style="display: none;">
+        <div class="context-menu-item" id="rename-chat">
+            <span class="material-icons-round">edit</span>
+            Rename
+        </div>
+        <div class="context-menu-item danger" id="delete-chat">
+            <span class="material-icons-round">delete</span>
+            Delete
+        </div>
+    </div>
+
+    <!-- Teach Bot Modal -->
+    <div class="modal-overlay" id="teach-modal" style="display: none;">
+        <div class="modal-content teach-modal" style="max-width: 600px; width: 90%;">
+            <div class="modal-header">
+                <h3>Teach BioStation AI</h3>
+                <button class="modal-close-btn" id="close-teach-modal">
+                    <span class="material-icons-round">close</span>
+                </button>
+            </div>
+            <div class="teach-form" style="padding: 20px;">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="concept-title" style="display: block; margin-bottom: 5px; font-weight: 500;">Concept
+                        Title</label>
+                    <input type="text" id="concept-title" placeholder="e.g., Bonferroni Correction"
+                        style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary);">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="concept-keywords" style="display: block; margin-bottom: 5px; font-weight: 500;">Keywords
+                        (comma separated)</label>
+                    <input type="text" id="concept-keywords" placeholder="correction, multiple testing, p-value"
+                        style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary);">
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="concept-content"
+                        style="display: block; margin-bottom: 5px; font-weight: 500;">Explanation (Markdown)</label>
+                    <textarea id="concept-content" rows="10" placeholder="## What is it?\n\nExplain here..."
+                        style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary); resize: vertical;"></textarea>
+                </div>
+                <div class="modal-actions" style="display: flex; justify-content: flex-end;">
+                    <button class="btn-primary" id="save-concept-btn"
+                        style="display: flex; align-items: center; gap: 5px;">
+                        <span class="material-icons-round">save</span> Save Knowledge
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code Editor Modal -->
+    <div class="modal-overlay" id="code-editor-modal" style="display: none;">
+        <div class="modal-content code-editor-modal">
+            <div class="modal-header">
+                <h3>R Code Editor</h3>
+                <div class="modal-actions">
+                    <button class="btn-secondary" id="copy-code-btn">
+                        <span class="material-icons-round">content_copy</span>
+                        Copy
+                    </button>
+                    <button class="btn-secondary" id="download-code-btn">
+                        <span class="material-icons-round">download</span>
+                        Download
+                    </button>
+                    <button class="btn-primary" id="run-code-btn">
+                        <span class="material-icons-round">play_arrow</span>
+                        Run
+                    </button>
+                    <button class="modal-close-btn" id="close-code-modal">
+                        <span class="material-icons-round">close</span>
+                    </button>
+                </div>
+            </div>
+            <div class="code-editor-container">
+                <textarea id="code-editor" class="code-editor" spellcheck="false"></textarea>
+            </div>
+            <div class="code-output-container" id="code-output" style="display: none;">
+                <div class="output-header">
+                    <span>Output</span>
+                    <button class="clear-output-btn" onclick="clearOutput()">Clear</button>
+                </div>
+                <pre class="code-output-content" id="code-output-content"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Visualization Modal -->
+    <div class="modal-overlay" id="viz-modal" style="display: none;">
+        <div class="modal-content viz-modal">
+            <div class="modal-header">
+                <h3>Results Visualization</h3>
+                <button class="modal-close-btn" id="close-viz-modal">
+                    <span class="material-icons-round">close</span>
+                </button>
+            </div>
+            <div class="viz-container" id="viz-container">
+                <!-- Visualization content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-r.min.js"></script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/code-editor.js') }}"></script>
+    <!-- AI Capability Guidebook -->
+    <script src="{{ url_for('static', filename='js/guidebook.js') }}"></script>
+</body>
+
+</html>
