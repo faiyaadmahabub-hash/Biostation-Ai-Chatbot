@@ -92,6 +92,10 @@ IMPORTANT: Output ONLY the JSON object, nothing else.'''
         if 'correlation' in msg_lower or 'correlate' in msg_lower:
             return {"action": "correlation", "understood_as": "Correlation analysis", "parameters": {}, "confidence": 0.9}
         
+        # Two-Way ANOVA keywords
+        if 'two way' in msg_lower or '2-way' in msg_lower or 'factorial' in msg_lower or 'interaction' in msg_lower:
+             return {"action": "compare_groups", "understood_as": "Perform Two-Way ANOVA", "parameters": {"test_type": "two_way_anova"}, "confidence": 0.95}
+
         # ANOVA keywords
         if 'anova' in msg_lower:
             return {"action": "compare_groups", "understood_as": "Perform ANOVA", "parameters": {"test_type": "anova"}, "confidence": 0.95}
@@ -113,10 +117,10 @@ IMPORTANT: Output ONLY the JSON object, nothing else.'''
         
         # Build context-aware prompt
         context = context or {}
-        cols = context.get('columns', [])
-        if cols is None: cols = []
-        columns_str = ", ".join(cols) if cols else "No dataset loaded"
-        
+        cols = context.get('column_names', context.get('columns', []))
+        # Ensure cols is a list, not an integer
+        if cols is None or isinstance(cols, int):
+            cols = []
         columns_str = ", ".join(cols) if cols else "No dataset loaded"
         history_str = context.get('history', 'No history')
         

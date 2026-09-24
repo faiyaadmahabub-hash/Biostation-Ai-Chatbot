@@ -62,3 +62,6 @@ installer/
 # Temporary files
 *.tmp
 *.bak
+
+#Claude
+claude/settings.local.json

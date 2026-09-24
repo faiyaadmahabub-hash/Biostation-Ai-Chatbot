@@ -32,7 +32,10 @@ class OllamaClient:
         
         # Verify model is available
         self._verify_model()
-    
+
+        # Check GPU acceleration status
+        self._check_gpu_status()
+
     def _verify_model(self):
         """Check if the model is available"""
         try:
@@ -68,7 +71,42 @@ class OllamaClient:
         except Exception as e:
             logger.error(f"Could not connect to Ollama server: {e}")
             logger.info("Make sure Ollama is running and accessible")
-    
+
+    def _check_gpu_status(self):
+        """Check if Ollama is using GPU acceleration"""
+        import subprocess
+        try:
+            result = subprocess.run(
+                ['ollama', 'ps'],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+
+            output = result.stdout.lower()
+
+            if any(keyword in output for keyword in ['gpu', 'cuda', 'rocm', 'metal']):
+                logger.info("✅ GPU ACCELERATION ACTIVE - Ollama is using GPU")
+                logger.info("Expected performance: 5-10x faster than CPU")
+                return True
+            else:
+                logger.warning("⚠️  RUNNING ON CPU ONLY - GPU not detected")
+                logger.warning("Performance may be slow. For GPU setup:")
+                logger.warning("   https://github.com/ollama/ollama/blob/main/docs/gpu.md")
+                logger.warning("   Windows: Reinstall Ollama or set OLLAMA_GPU=1")
+                return False
+
+        except subprocess.TimeoutExpired:
+            logger.error("❌ Ollama 'ps' command timed out")
+            return None
+        except FileNotFoundError:
+            logger.warning("⚠️  'ollama' command not found in PATH")
+            logger.warning("Cannot verify GPU status")
+            return None
+        except Exception as e:
+            logger.error(f"❌ Cannot verify GPU status: {e}")
+            return None
+
     def generate(
         self,
         prompt: str,

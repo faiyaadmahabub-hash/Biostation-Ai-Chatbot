@@ -30,15 +30,15 @@ class Config:
     SESSION_TIMEOUT = 3600  # 1 hour
     PERMANENT_SESSION_LIFETIME = 3600
     
-    # LLM settings
+    # LLM settings (OPTIMIZED FOR SPEED)
     LLM_MODEL = 'phi3:mini'  # Ollama model name
-    LLM_TEMPERATURE = 0.7
-    LLM_MAX_TOKENS = 2048
-    LLM_CONTEXT_WINDOW = 4096
-    
+    LLM_TEMPERATURE = 0.3    # Reduced from 0.7 for faster sampling
+    LLM_MAX_TOKENS = 512     # Reduced from 2048 for shorter, faster responses
+    LLM_CONTEXT_WINDOW = 2048  # Reduced from 4096 for faster processing
+
     # Ollama settings
     OLLAMA_BASE_URL = 'http://localhost:11434'
-    OLLAMA_TIMEOUT = 120  # seconds
+    OLLAMA_TIMEOUT = 30  # Reduced from 120 seconds for faster fails
     
     # R environment settings
     R_HOME = BASE_DIR / 'R-Portable'  # For bundled version

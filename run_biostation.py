@@ -13,7 +13,7 @@ import os
 app = create_app(config_name=os.getenv('FLASK_ENV', 'development'))
 
 if __name__ == '__main__':
-    print("=" * 60)
+    print("=" * 60) 
     print(" BioStation AI - Statistical Analysis Assistant")
     print("=" * 60)
     print(f" Version: {app.config['APP_VERSION']}")

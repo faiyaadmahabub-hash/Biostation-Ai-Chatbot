@@ -2,6 +2,7 @@
 from .executor import RExecutor, RExecutionResult, OutputParser, output_parser, r_executor as _rpy2_executor
 from .subprocess_executor import subprocess_r_executor
 from .validator import DataValidator, ValidationResult, data_validator
+from .error_analyzer import analyze_r_error, get_fix_for_template
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,11 +17,13 @@ else:
 
 __all__ = [
     'RExecutor',
-    'RExecutionResult', 
+    'RExecutionResult',
     'OutputParser',
     'r_executor',
     'output_parser',
     'DataValidator',
     'ValidationResult',
-    'data_validator'
+    'data_validator',
+    'analyze_r_error',
+    'get_fix_for_template'
 ]

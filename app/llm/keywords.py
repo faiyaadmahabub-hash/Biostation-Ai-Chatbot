@@ -69,6 +69,34 @@ INTENT_KEYWORDS: Dict[str, Dict[str, List[str]]] = {
             'move together',
         ],
     },
+
+    # ============ CORRELATION MATRIX ============
+    'correlation_matrix': {
+        'primary': [
+            'correlation matrix', 'correlation heatmap', 'heatmap',
+            'correlogram', 'corr matrix', 'cor matrix',
+            'all correlations', 'pairwise correlations',
+            'correlation plot', 'correlation table',
+        ],
+        'secondary': [
+            'numeric', 'all variables', 'numeric columns',
+            'matrix', 'overview', 'summary',
+            'p-value', 'significance', 'stars',
+        ],
+        'phrases': [
+            'show correlation matrix',
+            'correlation matrix heatmap',
+            'generate correlation matrix',
+            'show all correlations',
+            'correlations between all variables',
+            'correlation heatmap',
+            'pairwise correlation matrix',
+            'create correlation matrix',
+            'plot correlation matrix',
+            'visualize correlations',
+            'correlation overview',
+        ],
+    },
     
     # ============ REGRESSION ============
     'regression': {
@@ -346,16 +374,22 @@ INTENT_KEYWORDS: Dict[str, Dict[str, List[str]]] = {
         ],
     },
     
-    # ============ POST-HOC TESTS ============
+    # ============ POST-HOC TESTS & MULTIPLE COMPARISON CORRECTIONS ============
     'post_hoc': {
         'primary': [
             'post-hoc', 'post hoc', 'posthoc', 'pairwise',
             'tukey', 'bonferroni', 'scheffe', 'dunnett', 'dunn',
-            'multiple comparisons', 'correction',
+            'multiple comparisons', 'correction', 'corrections',
+            'holm', 'holm-bonferroni', 'fdr', 'benjamini', 'hochberg',
+            'benjamini-hochberg', 'false discovery', 'familywise',
+            'p-value adjustment', 'adjust p-value', 'adjusted p',
+            'multiple testing', 'type i error', 'false positive',
         ],
         'secondary': [
             'follow-up', 'followup', 'which groups differ',
             'adjustment', 'family-wise', 'fwer',
+            'control error', 'alpha', 'significance level',
+            'conservative', 'exploratory', 'confirmatory',
         ],
         'phrases': [
             'post hoc test',
@@ -363,7 +397,16 @@ INTENT_KEYWORDS: Dict[str, Dict[str, List[str]]] = {
             'pairwise comparisons',
             'tukey test',
             'bonferroni correction',
+            'holm correction',
+            'fdr correction',
             'multiple comparison correction',
+            'which correction should i use',
+            'correct for multiple testing',
+            'adjust for multiple comparisons',
+            'control false discovery rate',
+            'familywise error rate',
+            'too many comparisons',
+            'inflated type i error',
         ],
     },
     

@@ -127,39 +127,315 @@
         </div>
     </div>
 
-    <!-- Teach Bot Modal -->
+    <!-- Teach Bot Modal - Enhanced for Statistical Tests -->
     <div class="modal-overlay" id="teach-modal" style="display: none;">
-        <div class="modal-content teach-modal" style="max-width: 600px; width: 90%;">
+        <div class="modal-content teach-modal"
+            style="max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto;">
             <div class="modal-header">
-                <h3>Teach BioStation AI</h3>
+                <h3 id="teach-modal-title">Teach BioStation AI</h3>
                 <button class="modal-close-btn" id="close-teach-modal">
                     <span class="material-icons-round">close</span>
                 </button>
             </div>
-            <div class="teach-form" style="padding: 20px;">
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="concept-title" style="display: block; margin-bottom: 5px; font-weight: 500;">Concept
-                        Title</label>
-                    <input type="text" id="concept-title" placeholder="e.g., Bonferroni Correction"
-                        style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary);">
+
+            <!-- Tab Navigation -->
+            <div class="teach-tabs"
+                style="display: flex; border-bottom: 1px solid var(--border-color); padding: 0 20px;">
+                <button class="teach-tab active" data-tab="add-test"
+                    style="padding: 12px 20px; border: none; background: none; cursor: pointer; color: var(--text-primary); font-weight: 500; border-bottom: 2px solid var(--primary-color);">
+                    <span class="material-icons-round"
+                        style="font-size: 18px; vertical-align: middle; margin-right: 5px;">add_circle</span>
+                    Add Test
+                </button>
+                <button class="teach-tab" data-tab="manage-tests"
+                    style="padding: 12px 20px; border: none; background: none; cursor: pointer; color: var(--text-secondary); font-weight: 500; border-bottom: 2px solid transparent;">
+                    <span class="material-icons-round"
+                        style="font-size: 18px; vertical-align: middle; margin-right: 5px;">settings</span>
+                    Manage Tests
+                </button>
+            </div>
+
+            <!-- Add Test Tab Content -->
+            <div class="teach-tab-content" id="add-test-tab" style="padding: 20px;">
+                <input type="hidden" id="edit-test-id" value="">
+                <!-- Two-column layout -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <!-- Left Column - Basic Info -->
+                    <div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="test-name" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                                Test Name <span style="color: var(--error-color);">*</span>
+                            </label>
+                            <input type="text" id="test-name" placeholder="e.g., Friedman Test"
+                                style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary);">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="test-keywords" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                                Keywords (comma separated)
+                            </label>
+                            <input type="text" id="test-keywords"
+                                placeholder="friedman, repeated measures, non-parametric"
+                                style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary);">
+                            <small style="color: var(--text-secondary); font-size: 11px;">These trigger the test when
+                                users ask questions</small>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="test-purpose" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                                Purpose (one line)
+                            </label>
+                            <input type="text" id="test-purpose"
+                                placeholder="Compare 3+ related groups when data is not normal"
+                                style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary);">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="test-explanation" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                                Explanation <span style="color: var(--error-color);">*</span>
+                                <span style="color: var(--text-secondary); font-weight: normal; font-size: 11px;">(AI
+                                    uses this for interpretation)</span>
+                            </label>
+                            <textarea id="test-explanation" rows="5"
+                                placeholder="Explain when to use this test, how it works, and how to interpret results..."
+                                style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary); resize: vertical;"></textarea>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="test-assumptions" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                                Assumptions & Conditions
+                                <span style="color: var(--text-secondary); font-weight: normal; font-size: 11px;">(AI
+                                    uses this for assumptions section)</span>
+                            </label>
+                            <textarea id="test-assumptions" rows="4"
+                                placeholder="1. Observations are independent&#10;2. Data is at least ordinal&#10;3. Similar distribution shapes..."
+                                style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary); resize: vertical;"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - R Code -->
+                    <div>
+                        <div class="form-group" style="margin-bottom: 10px;">
+                            <label for="test-r-code" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                                R Code Template <span style="color: var(--error-color);">*</span>
+                            </label>
+                            <textarea id="test-r-code" rows="12"
+                                placeholder="# Your R code with placeholders&#10;{package_helper}&#10;ensure_package(&quot;ggplot2&quot;)&#10;library(ggplot2)&#10;&#10;{data_loading}&#10;&#10;# Run the test&#10;result <- friedman.test(...)&#10;print(result)"
+                                style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary); resize: vertical; font-family: monospace; font-size: 12px;"></textarea>
+                            <div id="r-code-validation" style="margin-top: 5px; font-size: 12px;"></div>
+                        </div>
+
+                        <!-- Help Panel with Tabs -->
+                        <div class="help-panel"
+                            style="background: var(--bg-tertiary); border-radius: 8px; overflow: hidden;">
+                            <!-- Help Tabs -->
+                            <div class="help-tabs"
+                                style="display: flex; border-bottom: 1px solid var(--border-color); background: var(--bg-secondary);">
+                                <button class="help-tab active" data-help-tab="placeholders"
+                                    onclick="switchHelpTab('placeholders')"
+                                    style="flex: 1; padding: 8px; border: none; background: none; cursor: pointer; font-size: 11px; color: var(--text-primary); border-bottom: 2px solid var(--primary-color);">
+                                    Placeholders
+                                </button>
+                                <button class="help-tab" data-help-tab="errors" onclick="switchHelpTab('errors')"
+                                    style="flex: 1; padding: 8px; border: none; background: none; cursor: pointer; font-size: 11px; color: var(--text-secondary); border-bottom: 2px solid transparent;">
+                                    Common Errors
+                                </button>
+                                <button class="help-tab" data-help-tab="formats" onclick="switchHelpTab('formats')"
+                                    style="flex: 1; padding: 8px; border: none; background: none; cursor: pointer; font-size: 11px; color: var(--text-secondary); border-bottom: 2px solid transparent;">
+                                    Data Formats
+                                </button>
+                                <button class="help-tab" data-help-tab="ai" onclick="switchHelpTab('ai')"
+                                    style="flex: 1; padding: 8px; border: none; background: none; cursor: pointer; font-size: 11px; color: var(--text-secondary); border-bottom: 2px solid transparent;">
+                                    AI Helper
+                                </button>
+                            </div>
+
+                            <!-- Tab Content -->
+                            <div style="padding: 12px; max-height: 280px; overflow-y: auto;">
+                                <!-- Placeholders Tab -->
+                                <div class="help-tab-content" id="help-placeholders" style="font-size: 11px;">
+                                    <div
+                                        style="margin-bottom: 10px; padding: 8px; background: var(--bg-secondary); border-radius: 4px; border-left: 3px solid var(--error-color);">
+                                        <strong>REQUIRED (Always include):</strong>
+                                        <div style="margin-top: 5px; font-family: monospace;">
+                                            <code>{package_helper}</code> - Package installer (PUT FIRST!)<br>
+                                            <code>{data_loading}</code> - Loads user's CSV/Excel
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        style="margin-bottom: 10px; padding: 8px; background: var(--bg-secondary); border-radius: 4px; border-left: 3px solid var(--primary-color);">
+                                        <strong>VARIABLES (Auto-filled from user's data):</strong>
+                                        <div style="margin-top: 5px; font-family: monospace;">
+                                            <code>{data}</code> - The dataframe name<br>
+                                            <code>{y_var}</code> - Outcome variable (data$last_col)<br>
+                                            <code>{x_var}</code> - Predictor variable<br>
+                                            <code>{group_var}</code> - Grouping variable (data$first_col)<br>
+                                            <code>{subject_var}</code> - Subject ID (for repeated measures)
+                                        </div>
+                                    </div>
+
+                                    <div style="padding: 8px; background: #fef3c7; border-radius: 4px; color: #92400e;">
+                                        <strong>R Curly Braces:</strong> Use <code>{{ '{{' }} {{ '}}' }}</code> for
+                                        if/else/loops<br>
+                                        <span style="font-family: monospace; font-size: 10px;">if (x &gt; 0) {{ '{{' }}
+                                            print("yes") {{ '}}' }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Common Errors Tab -->
+                                <div class="help-tab-content" id="help-errors" style="display: none; font-size: 11px;">
+                                    <div
+                                        style="margin-bottom: 10px; padding: 8px; background: #fee2e2; border-radius: 4px; color: #991b1b;">
+                                        <strong>"Column 'X' not found"</strong><br>
+                                        <em>Why:</em> Hardcoded column name instead of placeholder<br>
+                                        <em>Fix:</em> Use <code>{y_var}</code> or <code>{group_var}</code> instead
+                                    </div>
+
+                                    <div
+                                        style="margin-bottom: 10px; padding: 8px; background: #fee2e2; border-radius: 4px; color: #991b1b;">
+                                        <strong>"unexpected '{' in code"</strong><br>
+                                        <em>Why:</em> Single braces conflict with placeholders<br>
+                                        <em>Fix:</em> Use DOUBLE braces: <code>{{ '{{' }} code {{ '}}' }}</code>
+                                    </div>
+
+                                    <div
+                                        style="margin-bottom: 10px; padding: 8px; background: #fee2e2; border-radius: 4px; color: #991b1b;">
+                                        <strong>"object 'data' not found"</strong><br>
+                                        <em>Why:</em> Missing data loading step<br>
+                                        <em>Fix:</em> Add <code>{data_loading}</code> after
+                                        <code>{package_helper}</code>
+                                    </div>
+
+                                    <div style="padding: 8px; background: #fee2e2; border-radius: 4px; color: #991b1b;">
+                                        <strong>"arguments have different lengths"</strong><br>
+                                        <em>Why:</em> Data in WIDE format, test needs LONG format<br>
+                                        <em>Fix:</em> Add reshape code (see Data Formats tab)
+                                    </div>
+                                </div>
+
+                                <!-- Data Formats Tab -->
+                                <div class="help-tab-content" id="help-formats" style="display: none; font-size: 11px;">
+                                    <div style="margin-bottom: 10px;">
+                                        <strong>WIDE Format</strong> (each condition is a column):
+                                        <pre
+                                            style="background: var(--bg-secondary); padding: 6px; border-radius: 4px; font-size: 10px; margin: 5px 0;">Subject | Time1 | Time2 | Time3
+A       | 10    | 15    | 20
+B       | 12    | 18    | 22</pre>
+                                    </div>
+
+                                    <div style="margin-bottom: 10px;">
+                                        <strong>LONG Format</strong> (one row per observation):
+                                        <pre
+                                            style="background: var(--bg-secondary); padding: 6px; border-radius: 4px; font-size: 10px; margin: 5px 0;">Subject | Condition | Value
+A       | Time1     | 10
+A       | Time2     | 15
+A       | Time3     | 20</pre>
+                                    </div>
+
+                                    <div style="padding: 8px; background: #dbeafe; border-radius: 4px; color: #1e40af;">
+                                        <strong>Repeated measures tests need LONG format!</strong><br>
+                                        Add this reshape code:
+                                        <pre
+                                            style="background: var(--bg-secondary); padding: 6px; border-radius: 4px; font-size: 9px; margin: 5px 0; color: var(--text-primary);">num_cols &lt;- sapply({data}, is.numeric)
+if (sum(num_cols) &gt; 2) {{ '{{' }}
+  data_long &lt;- {data} %&gt;%
+    pivot_longer(cols = where(is.numeric),
+      names_to = "condition", values_to = "value")
+{{ '}}' }}</pre>
+                                    </div>
+                                </div>
+
+                                <!-- AI Helper Tab -->
+                                <div class="help-tab-content" id="help-ai" style="display: none; font-size: 11px;">
+                                    <p style="color: var(--text-secondary); margin-bottom: 8px;">
+                                        Copy this prompt to ChatGPT/Claude to generate your R template:
+                                    </p>
+                                    <div style="position: relative;">
+                                        <pre id="ai-prompt-template"
+                                            style="background: var(--bg-secondary); padding: 8px; border-radius: 4px; font-size: 9px; white-space: pre-wrap; max-height: 180px; overflow-y: auto;">Generate an R code template for [TEST NAME] statistical test.
+
+CRITICAL REQUIREMENTS:
+1. Start with {package_helper} on first line
+2. Use ensure_package("pkg") for each package
+3. Use {data_loading} to load data
+4. Use these EXACT placeholders (don't replace them):
+   - {data} for the dataframe
+   - {y_var} for outcome variable
+   - {x_var} for predictor variable
+   - {group_var} for grouping variable
+   - {subject_var} for subject ID (repeated measures)
+
+5. For if/else/loops, use DOUBLE braces:
+   if (x > 0) {{ '{{' }} print("yes") {{ '}}' }}
+
+6. For repeated measures, add auto-reshape:
+   num_cols <- sapply({data}, is.numeric)
+   if (sum(num_cols) > 2) {{ '{{' }}
+     data_long <- {data} %>%
+       pivot_longer(cols = where(is.numeric),
+         names_to = "condition", values_to = "value")
+   {{ '}}' }}
+
+7. Include: assumption checks, effect size, ggplot2 visualization
+8. Print results with cat() and print()</pre>
+                                        <button onclick="copyAIPrompt(this)"
+                                            style="position: absolute; top: 5px; right: 5px; padding: 4px 8px; font-size: 10px; cursor: pointer; background: var(--primary-color); color: white; border: none; border-radius: 4px;">
+                                            Copy
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="concept-keywords" style="display: block; margin-bottom: 5px; font-weight: 500;">Keywords
-                        (comma separated)</label>
-                    <input type="text" id="concept-keywords" placeholder="correction, multiple testing, p-value"
-                        style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary);">
-                </div>
-                <div class="form-group" style="margin-bottom: 20px;">
-                    <label for="concept-content"
-                        style="display: block; margin-bottom: 5px; font-weight: 500;">Explanation (Markdown)</label>
-                    <textarea id="concept-content" rows="10" placeholder="## What is it?\n\nExplain here..."
-                        style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary); resize: vertical;"></textarea>
-                </div>
-                <div class="modal-actions" style="display: flex; justify-content: flex-end;">
-                    <button class="btn-primary" id="save-concept-btn"
+
+                <!-- Action Buttons -->
+                <div class="modal-actions"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color);">
+                    <button onclick="validateRCode()" class="btn-secondary"
                         style="display: flex; align-items: center; gap: 5px;">
-                        <span class="material-icons-round">save</span> Save Knowledge
+                        <span class="material-icons-round">check_circle</span> Validate R Code
                     </button>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-secondary" id="cancel-edit-btn" style="display: none;"
+                            onclick="cancelEditTest()">
+                            Cancel Edit
+                        </button>
+                        <button class="btn-primary" id="save-concept-btn"
+                            style="display: flex; align-items: center; gap: 5px;">
+                            <span class="material-icons-round">save</span> <span id="save-btn-text">Save Statistical
+                                Test</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manage Tests Tab Content -->
+            <div class="teach-tab-content" id="manage-tests-tab" style="display: none; padding: 20px;">
+                <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <p style="color: var(--text-secondary); margin: 0;">
+                        Manage your custom statistical tests. Edit or delete tests you've previously taught.
+                    </p>
+                    <button onclick="loadCustomTests()" class="btn-secondary"
+                        style="display: flex; align-items: center; gap: 5px;">
+                        <span class="material-icons-round">refresh</span> Refresh
+                    </button>
+                </div>
+
+                <div id="custom-tests-list" style="display: flex; flex-direction: column; gap: 10px;">
+                    <div class="loading-tests" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                        <span class="material-icons-round"
+                            style="font-size: 48px; margin-bottom: 10px;">hourglass_empty</span>
+                        <p>Loading your tests...</p>
+                    </div>
+                </div>
+
+                <div id="no-tests-message"
+                    style="display: none; text-align: center; padding: 40px; color: var(--text-secondary);">
+                    <span class="material-icons-round" style="font-size: 48px; margin-bottom: 10px;">science</span>
+                    <p>You haven't taught any custom tests yet.</p>
+                    <p style="font-size: 14px;">Click "Add Test" to teach BioStation a new statistical test.</p>
                 </div>
             </div>
         </div>
@@ -178,6 +454,10 @@
                     <button class="btn-secondary" id="download-code-btn">
                         <span class="material-icons-round">download</span>
                         Download
+                    </button>
+                    <button class="btn-secondary" id="explain-code-btn">
+                        <span class="material-icons-round">psychology</span>
+                        Explain
                     </button>
                     <button class="btn-primary" id="run-code-btn">
                         <span class="material-icons-round">play_arrow</span>
@@ -201,6 +481,95 @@
         </div>
     </div>
 
+    <!-- Error Explanation Modal -->
+    <div class="modal-overlay" id="error-explain-modal" style="display: none;">
+        <div class="modal-content" style="max-width: 600px; width: 95%;">
+            <div class="modal-header" style="background: #fee2e2; border-radius: 8px 8px 0 0;">
+                <h3 style="color: #991b1b; display: flex; align-items: center; gap: 8px;">
+                    <span class="material-icons-round">error</span>
+                    Code Error Detected
+                </h3>
+                <button class="modal-close-btn" onclick="closeErrorExplainModal()">
+                    <span class="material-icons-round">close</span>
+                </button>
+            </div>
+            <div style="padding: 20px;">
+                <!-- Error Message -->
+                <div
+                    style="background: var(--bg-secondary); padding: 10px; border-radius: 4px; margin-bottom: 15px; font-family: monospace; font-size: 12px; color: var(--error-color);">
+                    <span id="error-message-display"></span>
+                </div>
+
+                <!-- Why It Happened -->
+                <div style="margin-bottom: 15px;">
+                    <h4
+                        style="display: flex; align-items: center; gap: 5px; margin-bottom: 8px; color: var(--text-primary);">
+                        <span class="material-icons-round" style="color: #f59e0b;">lightbulb</span>
+                        Why This Happened
+                    </h4>
+                    <p id="error-why-text" style="color: var(--text-secondary); font-size: 13px; line-height: 1.5;"></p>
+                </div>
+
+                <!-- Dataset Columns (if relevant) -->
+                <div id="error-columns-section"
+                    style="display: none; margin-bottom: 15px; padding: 10px; background: #dbeafe; border-radius: 4px;">
+                    <strong style="color: #1e40af; font-size: 12px;">Your dataset columns:</strong>
+                    <p id="error-columns-list"
+                        style="font-family: monospace; font-size: 11px; margin-top: 5px; color: #1e3a8a;"></p>
+                </div>
+
+                <!-- Suggested Fix -->
+                <div style="margin-bottom: 15px;">
+                    <h4
+                        style="display: flex; align-items: center; gap: 5px; margin-bottom: 8px; color: var(--text-primary);">
+                        <span class="material-icons-round" style="color: #10b981;">build</span>
+                        Suggested Fix
+                    </h4>
+                    <p id="error-suggestion-text"
+                        style="color: var(--text-secondary); font-size: 13px; margin-bottom: 10px;"></p>
+
+                    <!-- Code Snippet (if available) -->
+                    <div id="error-code-snippet-section" style="display: none;">
+                        <pre id="error-code-snippet"
+                            style="background: var(--bg-secondary); padding: 10px; border-radius: 4px; font-size: 11px; overflow-x: auto; border-left: 3px solid var(--primary-color);"></pre>
+                    </div>
+                </div>
+
+                <!-- Alternatives (if available) -->
+                <div id="error-alternatives-section" style="display: none; margin-bottom: 15px;">
+                    <h4
+                        style="display: flex; align-items: center; gap: 5px; margin-bottom: 8px; color: var(--text-primary);">
+                        <span class="material-icons-round" style="color: #8b5cf6;">swap_horiz</span>
+                        Alternative Solutions
+                    </h4>
+                    <div id="error-alternatives-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div
+                    style="display: flex; flex-wrap: wrap; gap: 10px; padding-top: 15px; border-top: 1px solid var(--border-color);">
+                    <button id="apply-fix-btn" onclick="applyErrorFix()" class="btn-primary"
+                        style="display: none; flex: 1; min-width: 120px;">
+                        <span class="material-icons-round">auto_fix_high</span>
+                        Apply Fix
+                    </button>
+                    <button id="copy-fix-btn" onclick="copyErrorFix()" class="btn-secondary"
+                        style="display: none; flex: 1; min-width: 120px;">
+                        <span class="material-icons-round">content_copy</span>
+                        Copy Fix
+                    </button>
+                    <button onclick="askAIForHelp()" class="btn-secondary" style="flex: 1; min-width: 120px;">
+                        <span class="material-icons-round">smart_toy</span>
+                        Ask AI for Help
+                    </button>
+                    <button onclick="closeErrorExplainModal()" class="btn-secondary" style="flex: 1; min-width: 100px;">
+                        Dismiss
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Result Visualization Modal -->
     <div class="modal-overlay" id="viz-modal" style="display: none;">
         <div class="modal-content viz-modal">
@@ -212,6 +581,76 @@
             </div>
             <div class="viz-container" id="viz-container">
                 <!-- Visualization content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Preview Modal -->
+    <div class="modal-overlay" id="preview-modal" style="display: none;">
+        <div class="modal-content preview-modal">
+            <div class="modal-header">
+                <h3 id="preview-modal-title">Dataset Preview</h3>
+                <div class="modal-actions">
+                    <button class="btn-secondary" id="refresh-preview-btn">
+                        <span class="material-icons-round">refresh</span>
+                        Refresh
+                    </button>
+                    <button class="modal-close-btn" id="close-preview-modal">
+                        <span class="material-icons-round">close</span>
+                    </button>
+                </div>
+            </div>
+            <div class="preview-container" id="preview-container">
+                <!-- Preview tabs -->
+                <div class="preview-tabs">
+                    <button class="preview-tab active" data-tab="data">Data</button>
+                    <button class="preview-tab" data-tab="columns">Columns</button>
+                    <button class="preview-tab" data-tab="stats">Statistics</button>
+                </div>
+
+                <!-- Tab content -->
+                <div class="preview-tab-content" id="preview-data-tab">
+                    <div class="preview-summary" id="preview-summary">
+                        <!-- Summary info will be inserted here -->
+                    </div>
+                    <div class="preview-table-wrapper">
+                        <table class="preview-table" id="preview-table">
+                            <!-- Table will be populated by JavaScript -->
+                        </table>
+                    </div>
+                </div>
+
+                <div class="preview-tab-content" id="preview-columns-tab" style="display: none;">
+                    <div class="columns-list" id="columns-list">
+                        <!-- Column info will be inserted here -->
+                    </div>
+                </div>
+
+                <div class="preview-tab-content" id="preview-stats-tab" style="display: none;">
+                    <div class="stats-container" id="stats-container">
+                        <!-- Statistics will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code Explanation Modal -->
+    <div class="modal-overlay" id="explain-modal" style="display: none;">
+        <div class="modal-content explain-modal">
+            <div class="modal-header">
+                <h3 id="explain-modal-title">Code Explanation</h3>
+                <button class="modal-close-btn" id="close-explain-modal">
+                    <span class="material-icons-round">close</span>
+                </button>
+            </div>
+            <div class="explain-container" id="explain-container">
+                <div class="explain-summary" id="explain-summary" style="display: none;">
+                    <!-- Quick summary will be shown here -->
+                </div>
+                <div class="explain-content" id="explain-content">
+                    <!-- Explanation will be streamed here -->
+                </div>
             </div>
         </div>
     </div>

@@ -78,6 +78,29 @@ Structure:
 - How to interpret results
 - Common mistakes to avoid"""
 
+    # Code Explainer
+    CODE_EXPLAINER = """You are an expert R programming tutor explaining statistical code to bioscience students.
+
+Your task is to provide a clear, educational explanation of R code that performs statistical analysis.
+
+Guidelines:
+- Break down the code into logical sections
+- Explain what EACH section does in simple, accessible language
+- Highlight key statistical concepts and why they matter
+- Point out any assumptions being tested or checked
+- Explain the interpretation of results (what to look for in output)
+- Use analogies when helpful for complex concepts
+- Be encouraging and educational
+
+Structure your explanation as:
+1. **Overview**: What does this code accomplish? (1-2 sentences)
+2. **Step-by-Step Breakdown**: Explain each logical section
+3. **Key Statistical Concepts**: Highlight important statistical ideas
+4. **Interpreting Results**: What should the user look for in the output?
+5. **Assumptions & Considerations**: Any assumptions or things to watch for
+
+Keep explanations clear and practical. Avoid unnecessary jargon, but introduce statistical terms with definitions when needed."""
+
     # General Conversation
     GENERAL_ASSISTANT = """You are BioStation AI, a professional and helpful assistant for bioscience students working with statistical analysis in R.
     
@@ -192,3 +215,30 @@ Student's Question: {query}
 
 Provide a clear, concise explanation focusing on practical understanding for bioscience students.
 Start with a brief 2-3 sentence overview, then offer to explain more if needed."""
+
+    @staticmethod
+    def get_code_explanation_prompt(
+        code: str,
+        test_type: str = None
+    ) -> str:
+        """Generate prompt for R code explanation
+
+        Args:
+            code: The R code to explain
+            test_type: Optional type of statistical test (e.g., 't-test', 'ANOVA')
+
+        Returns:
+            Formatted prompt for code explanation
+        """
+        context = f"This code performs a {test_type} analysis." if test_type else ""
+
+        return f"""{PromptTemplates.CODE_EXPLAINER}
+
+{context}
+
+R Code to Explain:
+```r
+{code}
+```
+
+Please provide a comprehensive but accessible explanation of this code for a bioscience student learning R and statistics."""

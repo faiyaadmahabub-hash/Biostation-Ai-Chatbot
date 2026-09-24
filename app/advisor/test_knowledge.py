@@ -149,15 +149,53 @@ STATISTICAL_TESTS: Dict[str, StatisticalTest] = {
         how_it_works="Partitions total variance into between-group and within-group variance. If between-group variance is large relative to within-group variance, groups differ significantly.",
         interpretation={
             "p < 0.05": "At least one group mean differs significantly from the others",
-            "p ≥ 0.05": "No significant differences among group means"
+            "p ≥ 0.05": "No significant differences among group means",
+            "Post-hoc tests": "Use Tukey HSD, Bonferroni, Holm, or FDR to identify which specific groups differ"
         },
         r_function="aov(value ~ group, data = df) or summary(aov(...))",
-        r_packages=["stats", "car"],
+        r_packages=["stats", "car", "multcomp"],
         example_context="Comparing plant growth across 4 different fertilizer treatments.",
         common_mistakes=[
             "Not following up with post-hoc tests to identify which groups differ",
             "Using with unequal variances (use Welch's ANOVA)",
-            "Running multiple t-tests instead (inflates Type I error)"
+            "Running multiple t-tests instead (inflates Type I error)",
+            "Not applying multiple comparison corrections (increases false positives)"
+        ]
+    ),
+    
+    "two_way_anova": StatisticalTest(
+        id="two_way_anova",
+        name="Two-Way ANOVA",
+        also_known_as=["Factorial ANOVA", "Two-factor ANOVA"],
+        category="parametric",
+        purpose="Compare means across groups defined by two different categorical factors",
+        use_when=[
+            "Comparing groups based on 2 factors (e.g., Treatment and Sex)",
+            "Checking for interaction effects between factors",
+            "Continuous outcome variable",
+            "Data is approximately normal"
+        ],
+        assumptions=[
+            "Independence of observations",
+            "Normality within each group combination",
+            "Homogeneity of variances (Levene's test)",
+            "Absence of significant outliers"
+        ],
+        how_it_works="Tests the main effect of each factor and their interaction. An interaction means the effect of one factor depends on the level of the other factor. Post-hoc tests with multiple comparison corrections (Tukey, Bonferroni, Holm, FDR) identify which specific groups differ.",
+        interpretation={
+            "Main effect p < 0.05": "Significant difference between levels of this factor",
+            "Interaction p < 0.05": "Effect of one factor depends on the other - examine simple effects",
+            "Partial Eta Squared": "Effect size (0.01=small, 0.06=medium, 0.14=large)",
+            "Post-hoc tests": "Use Tukey/Bonferroni/Holm/FDR to find which groups differ"
+        },
+        r_function="aov(outcome ~ factor1 * factor2, data = df)",
+        r_packages=["stats", "car", "emmeans"],
+        example_context="Analyzing if plant growth (outcome) is affected by both sunlight (high/low) AND water (high/low).",
+        common_mistakes=[
+            "Ignoring significant interactions when interpreting main effects",
+            "Using with only 1 factor (use One-Way ANOVA)",
+            "Not checking for unbalanced design (use Type II/III SS)",
+            "Not applying multiple comparison corrections for post-hoc tests"
         ]
     ),
     
@@ -639,6 +677,52 @@ STATISTICAL_TESTS: Dict[str, StatisticalTest] = {
         ]
     ),
     
+    # ============ MULTIPLE COMPARISON CORRECTIONS ============
+    "multiple_comparison": StatisticalTest(
+        id="multiple_comparison",
+        name="Multiple Comparison Corrections",
+        also_known_as=["Post-hoc corrections", "p-value adjustment", "Multiple testing corrections"],
+        category="assumption",
+        purpose="Control the error rate when performing multiple statistical comparisons simultaneously",
+        use_when=[
+            "Running post-hoc tests after ANOVA",
+            "Comparing multiple groups pairwise",
+            "Testing multiple hypotheses on the same dataset",
+            "Performing subgroup analyses"
+        ],
+        assumptions=[
+            "Multiple tests are being conducted",
+            "Tests may be on the same or related data",
+            "Need to control overall error rate"
+        ],
+        how_it_works="""When you perform multiple statistical tests, the probability of making at least one Type I error (false positive) increases. Without correction, if you perform 20 tests at α=0.05, you have a 64% chance of at least one false positive!
+
+**Available Correction Methods:**
+
+1. **Bonferroni**: Divides α by the number of tests (α/n). Very conservative, minimizes false positives but may miss true effects.
+
+2. **Holm (Sequential Bonferroni)**: Ranks p-values and applies increasingly lenient thresholds. More powerful than Bonferroni while still controlling familywise error rate.
+
+3. **FDR (Benjamini-Hochberg)**: Controls the expected proportion of false discoveries among rejected hypotheses. Less conservative, better for exploratory research.
+
+4. **Tukey HSD**: Specifically designed for all pairwise comparisons after ANOVA. Controls familywise error rate for balanced designs.""",
+        interpretation={
+            "Bonferroni p < 0.05": "Strong evidence - survives strictest correction",
+            "Holm p < 0.05": "Good evidence - more powerful than Bonferroni",
+            "FDR p < 0.05": "Suggestive evidence - controls false discovery proportion",
+            "Tukey p < 0.05": "Significant pairwise difference (for ANOVA)"
+        },
+        r_function="p.adjust(p_values, method = 'bonferroni'/'holm'/'fdr'); pairwise.t.test(..., p.adjust.method = 'bonferroni')",
+        r_packages=["stats", "emmeans", "multcomp"],
+        example_context="After finding a significant ANOVA result comparing 4 treatment groups, you want to know which specific groups differ while controlling the false positive rate.",
+        common_mistakes=[
+            "Not correcting at all when doing multiple comparisons (inflated Type I error)",
+            "Using Bonferroni when you have many comparisons (too conservative, misses real effects)",
+            "Using FDR for confirmatory research (not strict enough)",
+            "Applying corrections to independent hypotheses unnecessarily"
+        ]
+    ),
+
     # ============ DESCRIPTIVE STATISTICS ============
     "descriptive": StatisticalTest(
         id="descriptive",

@@ -1,0 +1,27 @@
+{
+  "custom_66143668": {
+    "id": "custom_66143668",
+    "name": "Friedman Test",
+    "category": "non-parametric",
+    "keywords": [
+      "friedman",
+      "repeated measures",
+      "non-parametric",
+      "related samples",
+      "within-subjects",
+      "ranks",
+      "friedman test"
+    ],
+    "purpose": "Compare three or more related groups when the dependent variable is ordinal or not normally distributed.",
+    "explanation": "The Friedman Test is a non-parametric alternative to repeated-measures ANOVA. It is used when the same subjects are measured under three or more conditions and the normality assumption is violated. The test ranks values within each subject across conditions, then evaluates whether the rank sums differ significantly between groups. A significant result indicates that at least one condition differs from another, but it does not specify which groups differ; post-hoc pairwise tests are required for that.",
+    "assumptions": "The same subjects are measured across all conditions (related samples).\n\nThe dependent variable is at least ordinal.\n\nObservations within each subject are comparable across conditions.\n\nDistributions across conditions have similar shapes.\n\nSamples are independent between subjects.",
+    "r_template": "# =========================\n# Friedman Test R Template\n# =========================\n\n# ---- Package management ----\n{package_helper}\nensure_package(\"tidyverse\")\nensure_package(\"rstatix\")\nensure_package(\"ggplot2\")\n\n# ---- Data loading ----\n{data_loading}\n\n# ---- Inspect original data ----\ncat(\"Original data structure:\\n\")\nprint(str({data}))\nprint(head({data}))\n\n# ---- Auto-detect and reshape if wide format ----\n# Wide format: first column is subject ID, remaining columns are conditions\n# Long format: already has subject, condition, and value columns\n\n# Check if data appears to be in wide format (many numeric columns)\nnum_cols <- sapply({data}, is.numeric)\nif (sum(num_cols) > 2) {{\n  cat(\"\\nDetected WIDE format data. Reshaping to LONG format...\\n\")\n  \n  # Assume first column is subject identifier\n  subject_col <- names({data})[1]\n  value_cols <- names({data})[num_cols]\n  \n  data_long <- {data} %>%\n    tidyr::pivot_longer(\n      cols = all_of(value_cols),\n      names_to = \"condition\",\n      values_to = \"value\"\n    ) %>%\n    dplyr::mutate(\n      subject = as.factor(!!sym(subject_col)),\n      condition = as.factor(condition)\n    )\n  \n  cat(\"Reshaped data structure:\\n\")\n  print(head(data_long))\n  \n  # Use reshaped data\n  analysis_data <- data_long\n  subject_var <- \"subject\"\n  group_var <- \"condition\"\n  y_var <- \"value\"\n}} else {{\n  cat(\"\\nData appears to be in LONG format.\\n\")\n  analysis_data <- {data}\n  subject_var <- \"{subject_var}\"\n  group_var <- \"{group_var_clean}\"\n  y_var <- \"{y_var_clean}\"\n}}\n\n# ---- Assumption checks ----\n# 1. Related samples (same subjects measured across all groups)\ncat(\"\\nChecking repeated-measures structure...\\n\")\nsubject_counts <- analysis_data %>%\n  dplyr::count(!!sym(subject_var))\nprint(subject_counts)\n\n# 2. Distribution shapes (visual check)\nggplot(analysis_data, aes(x = !!sym(group_var), y = !!sym(y_var))) +\n  geom_boxplot() +\n  theme_minimal() +\n  labs(\n    title = \"Distribution of Outcome by Group\",\n    x = \"Condition\",\n    y = \"Value\"\n  )\n\n# ---- Friedman Test ----\ncat(\"\\nRunning Friedman Test...\\n\")\n\n# Build formula dynamically\nfriedman_formula <- as.formula(paste(y_var, \"~\", group_var, \"|\", subject_var))\n\nfriedman_result <- friedman.test(\n  formula = friedman_formula,\n  data = analysis_data\n)\n\nprint(friedman_result)\n\n# ---- Effect size: Kendall's W ----\ncat(\"\\nCalculating effect size (Kendall's W)...\\n\")\n\neffect_size <- analysis_data %>%\n  rstatix::friedman_effsize(\n    formula = friedman_formula\n  )\n\nprint(effect_size)\n\n# ---- Post-hoc analysis (if significant) ----\ncat(\"\\nPost-hoc pairwise Wilcoxon tests with Bonferroni correction...\\n\")\n\n# Build post-hoc formula\nposthoc_formula <- as.formula(paste(y_var, \"~\", group_var))\n\nposthoc <- analysis_data %>%\n  rstatix::pairwise_wilcox_test(\n    formula = posthoc_formula,\n    paired = TRUE,\n    p.adjust.method = \"bonferroni\"\n  )\n\nprint(posthoc)\n\n# ---- Visualization: mean ranks ----\nranked_data <- analysis_data %>%\n  dplyr::group_by(!!sym(subject_var)) %>%\n  dplyr::mutate(rank = rank(!!sym(y_var))) %>%\n  dplyr::group_by(!!sym(group_var)) %>%\n  dplyr::summarise(mean_rank = mean(rank), .groups = \"drop\")\n\nggplot(ranked_data, aes(x = !!sym(group_var), y = mean_rank)) +\n  geom_col(fill = \"steelblue\") +\n  theme_minimal() +\n  labs(\n    title = \"Mean Ranks by Group (Friedman Test)\",\n    x = \"Condition\",\n    y = \"Mean Rank\"\n  )",
+    "r_packages": [
+      "tidyverse",
+      "ggplot2",
+      "rstatix"
+    ],
+    "added_at": "2026-01-23T18:52:20.874215",
+    "source": "user_teach_mode"
+  }
+}

@@ -1,5 +1,5 @@
 """
-File handler routes - Handle dataset uploads
+File handler routes - Handle dataset uploads and previews
 """
 
 from flask import Blueprint, request, jsonify, current_app, session
@@ -13,6 +13,9 @@ logger = logging.getLogger(__name__)
 
 # Create blueprint
 file_bp = Blueprint('file', __name__)
+
+# Import preview generator
+from app.preview import DataPreviewGenerator
 
 
 def allowed_file(filename):
@@ -59,15 +62,19 @@ def upload_file():
                 df = pd.read_excel(filepath)
             else:
                 df = pd.read_csv(filepath)
-            
+
             # Get basic info
             rows, cols = df.shape
             column_names = df.columns.tolist()
-            
+
+            # Generate preview data
+            preview_generator = DataPreviewGenerator(df)
+            preview_data = preview_generator.generate_preview(n_rows=10)
+
             # === SAVE TO PERSISTENT STORAGE ===
             from app.chat_storage_manager import dataset_storage
-            dataset_storage.save_dataset(filename, filepath, column_names, rows)
-            
+            dataset_storage.save_dataset(filename, filepath, column_names, rows, preview_data)
+
             session['current_dataset'] = {
                 'filename': filename,
                 'filepath': filepath,
@@ -76,20 +83,21 @@ def upload_file():
                 'column_names': column_names
             }
             session.modified = True
-            
+
             # Save upload event to chat history
             conversation_id = request.form.get('conversation_id')
             if conversation_id:
                 from app.chat_storage_manager import chat_storage
                 chat_storage.add_message(conversation_id, 'user', f"Uploaded file: {filename}")
                 chat_storage.add_message(conversation_id, 'assistant', f"I have received the file {filename} with {rows} rows and {cols} columns.")
-            
+
             return jsonify({
                 'success': True,
                 'filename': filename,
                 'rows': rows,
                 'columns': cols,
                 'column_names': column_names,
+                'preview': preview_data,
                 'message': 'File saved securely.'
             })
         
@@ -120,7 +128,7 @@ def get_dataset_info():
             'success': True,
             'dataset': session['current_dataset']
         })
-    
+
     # Check persistent storage if session is empty
     from app.chat_storage_manager import dataset_storage
     active = dataset_storage.get_active_dataset()
@@ -130,9 +138,89 @@ def get_dataset_info():
             'success': True,
             'dataset': active
         })
-        
+
     else:
         return jsonify({
             'success': False,
             'message': 'No dataset loaded'
         })
+
+
+@file_bp.route('/api/dataset-preview', methods=['GET'])
+def get_dataset_preview():
+    """Get preview data for the currently loaded dataset"""
+    from app.chat_storage_manager import dataset_storage
+
+    result = dataset_storage.get_dataset_preview()
+
+    if result['success'] and result.get('preview'):
+        return jsonify(result)
+
+    # If no preview in storage, try to generate from file
+    active = dataset_storage.get_active_dataset()
+    if active and active.get('filepath'):
+        filepath = active['filepath']
+        if os.path.exists(filepath):
+            try:
+                preview_generator = DataPreviewGenerator.from_file(filepath)
+                preview_data = preview_generator.generate_preview(n_rows=10)
+
+                # Save the generated preview
+                dataset_storage.update_dataset_preview(preview_data)
+
+                return jsonify({
+                    'success': True,
+                    'filename': active['filename'],
+                    'filepath': filepath,
+                    'preview': preview_data
+                })
+            except Exception as e:
+                logger.error(f"Error generating preview: {e}")
+                return jsonify({
+                    'success': False,
+                    'error': f'Could not generate preview: {str(e)}'
+                }), 500
+
+    return jsonify({
+        'success': False,
+        'error': 'No dataset loaded or file not found'
+    }), 404
+
+
+@file_bp.route('/api/dataset-preview/refresh', methods=['POST'])
+def refresh_dataset_preview():
+    """Regenerate preview for the current dataset"""
+    from app.chat_storage_manager import dataset_storage
+
+    active = dataset_storage.get_active_dataset()
+    if not active or not active.get('filepath'):
+        return jsonify({
+            'success': False,
+            'error': 'No dataset loaded'
+        }), 404
+
+    filepath = active['filepath']
+    if not os.path.exists(filepath):
+        return jsonify({
+            'success': False,
+            'error': 'Dataset file not found'
+        }), 404
+
+    try:
+        preview_generator = DataPreviewGenerator.from_file(filepath)
+        preview_data = preview_generator.generate_preview(n_rows=10)
+
+        # Update stored preview
+        dataset_storage.update_dataset_preview(preview_data)
+
+        return jsonify({
+            'success': True,
+            'filename': active['filename'],
+            'preview': preview_data
+        })
+    except Exception as e:
+        logger.error(f"Error refreshing preview: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Could not refresh preview: {str(e)}'
+        }), 500
