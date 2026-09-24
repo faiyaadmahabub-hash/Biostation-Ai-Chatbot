@@ -65,3 +65,4 @@ installer/
 
 #Claude
 claude/settings.local.json
+nul
