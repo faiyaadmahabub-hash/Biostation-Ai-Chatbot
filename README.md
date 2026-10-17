@@ -1,4 +1,4 @@
-﻿# BioStation AI
+# BioStation AI
 
 A local statistical-analysis assistant for bioscience students. Upload a table, explore its columns, generate R analysis code, and use a chat interface to ask for help selecting and interpreting statistical tests.
 
@@ -70,4 +70,3 @@ Keep this app on loopback for trusted local experiments. It executes arbitrary R
 ## Provenance and documentation
 
 This repository is collaborative work; commit history includes `takif0`, Emmanuel Nara and `faiyaadmahabub-hash`. This page describes the checked-in system and does not attribute every component to one contributor. The [full original guide](docs/PROJECT_GUIDE.md), [implementation plan](IMPLEMENTATION_PLAN.md) and [refactoring notes](REFACTORING_PROGRESS.md) retain the technical background. No license file is currently included; do not assume reuse permission.
-
