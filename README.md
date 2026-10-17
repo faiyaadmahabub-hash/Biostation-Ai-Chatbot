@@ -693,7 +693,7 @@ These problems were found by reading the whole codebase; none of them were repro
 - **The chat view renders text as HTML.** `formatMessage` in `chat.js` writes message and LLM text through `innerHTML` without escaping, so an uploaded file name or a model reply containing markup is rendered as markup.
 - **Development fallback `SECRET_KEY`** in `config.py`. Set the `SECRET_KEY` environment variable for anything beyond local use.
 - **Chat history is plain text** in SQLite and stores absolute paths of uploaded files (see [Security and privacy notes](#security-and-privacy-notes)).
-- **Runtime data was once committed.** Earlier versions of this repository tracked the SQLite chat databases (`data/chats.db`, `data/database/chats.db`), a local editor settings file, generated plots and uploaded datasets. The databases and the settings file were purged from the Git history; the plots, datasets and intent stores were removed from the current tree and are now ignored. If you cloned the repository before that cleanup, delete your copy of those files.
+- **Runtime data was once committed.** Earlier versions of this repository tracked the SQLite chat databases (`data/chats.db`, `data/database/chats.db`), a local editor settings file, generated plots and uploaded datasets. The databases and the settings file were removed from the branch history; the plots, datasets and intent stores were removed from the current tree and are now ignored. If you cloned the repository before that cleanup, delete your copy of those files.
 
 ### Code quality, dependencies and tests
 
